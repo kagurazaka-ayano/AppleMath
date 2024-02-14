@@ -87,8 +87,9 @@ namespace Math {
         return Vector3(simd::cross(data, rhs.data));
     }
 
-    Vector2 Vector2::unit() const {
-        return *this / length();
+
+    Vector2 Vector2::operator-() const {
+        return Vector2(-data);
     }
 
     Vector3::Vector3() : Vector3(simd::double3{0.0, 0.0, 0.0}) {
@@ -203,8 +204,9 @@ namespace Math {
 
     }
 
-    Vector3 Vector3::unit() const {
-        return *this / length();
+
+    Vector3 Vector3::operator-() const {
+        return Vector3(-data);
     }
 
     Vector4::Vector4() : Vector4(simd::double4{0.0, 0.0, 0.0, 0.0}) {
@@ -313,8 +315,9 @@ namespace Math {
         return Vector4(data * rhs.data);
     }
 
-    Vector4 Vector4::unit() const {
-        return *this / length();
+
+    Vector4 Vector4::operator-() const {
+        return Vector4(-data);
     }
 }
 

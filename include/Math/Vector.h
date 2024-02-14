@@ -37,6 +37,8 @@ namespace Math {
 
         Vector2 operator-(const Vector2& rhs) const;
 
+        Vector2 operator-() const;
+
         Vector2 operator*(double rhs) const;
 
         Vector2 operator/(double rhs) const;
@@ -69,7 +71,6 @@ namespace Math {
         
         [[nodiscard]] Vector2 componentProd(const Vector2& rhs) const;
 
-        [[nodiscard]] Vector2 unit() const;
 
     private:
         simd::double2 data;
@@ -98,6 +99,8 @@ namespace Math {
         Vector3& operator=(const Vector3& other);
 
         Vector3 operator+(const Vector3& rhs) const;
+
+        Vector3 operator-() const;
 
         Vector3 operator-(const Vector3& rhs) const;
 
@@ -133,7 +136,6 @@ namespace Math {
 
         [[nodiscard]] Vector3 componentProd(const Vector3& rhs) const;
 
-        [[nodiscard]] Vector3 unit() const;
     private:
         simd::double3 data;
     };
@@ -162,6 +164,8 @@ namespace Math {
         Vector4 operator+(const Vector4& rhs) const;
 
         Vector4 operator-(const Vector4& rhs) const;
+
+        Vector4 operator-() const;
 
         Vector4 operator*(double rhs) const;
 
@@ -193,7 +197,6 @@ namespace Math {
 
         [[nodiscard]] Vector4 componentProd(const Vector4& rhs) const;
 
-        [[nodiscard]] Vector4 unit() const;
     private:
         simd::double4 data;
     };
