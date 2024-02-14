@@ -224,7 +224,7 @@ TEST(Vector4Tests, DivisionOperator) {
 
 TEST(Vector4Tests, Length) {
     Vector4 v(1.0, 2.0, 2.0, 2.0);
-    EXPECT_NEAR(v.length(), 3.6055512755, 1e-4);
+    EXPECT_NEAR(v.length(), 3.6055, 1e-4);
 }
 
 TEST(Vector4Tests, Normalization) {

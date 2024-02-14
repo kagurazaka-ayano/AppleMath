@@ -14,6 +14,13 @@
 
 #ifdef __APPLE__
 namespace Math {
+
+    class Vector2;
+
+    class Vector3;
+
+    class Vector4;
+
     class Vector2 {
     public:
         Vector2();
@@ -50,15 +57,20 @@ namespace Math {
 
         explicit operator std::string() const;
 
-        double lengthSq() const;
+        [[nodiscard]] double lengthSq() const;
 
-        double length() const;
+        [[nodiscard]] double length() const;
 
-        Vector2 normalized() const;
+        [[nodiscard]] Vector2 normalized() const;
 
-        double dot(const Vector2& rhs) const;
+        [[nodiscard]] double dot(const Vector2& rhs) const;
+
+        [[nodiscard]] Vector3 cross(const Vector2& rhs) const;
         
-        Vector2 componentProd(const Vector2& rhs) const;
+        [[nodiscard]] Vector2 componentProd(const Vector2& rhs) const;
+
+        [[nodiscard]] Vector2 unit() const;
+
     private:
         simd::double2 data;
     };
@@ -66,11 +78,18 @@ namespace Math {
         return rhs * lhs;
     }
 
+    inline std::ostream& operator<<(std::ostream& os, const Vector2& v) {
+        os << static_cast<std::string>(v);
+        return os;
+    }
+
     class Vector3 {
     public:
         Vector3();
 
         Vector3(double x, double y, double z);
+
+        Vector3(const Vector2& other, double z);
 
         explicit Vector3(const simd::double3& data);
 
@@ -113,9 +132,20 @@ namespace Math {
         [[nodiscard]] double dot(const Vector3& rhs) const;
 
         [[nodiscard]] Vector3 componentProd(const Vector3& rhs) const;
+
+        [[nodiscard]] Vector3 unit() const;
     private:
         simd::double3 data;
     };
+
+    inline Vector3 operator*(double lhs, const Vector3& rhs) {
+        return rhs * lhs;
+    }
+
+    inline std::ostream& operator<<(std::ostream& os, const Vector3& v) {
+        os << static_cast<std::string>(v);
+        return os;
+    }
 
     class Vector4 {
     public:
@@ -162,9 +192,21 @@ namespace Math {
         [[nodiscard]] double dot(const Vector4& rhs) const;
 
         [[nodiscard]] Vector4 componentProd(const Vector4& rhs) const;
+
+        [[nodiscard]] Vector4 unit() const;
     private:
         simd::double4 data;
     };
+
+    inline Vector4 operator*(double lhs, const Vector4& rhs) {
+        return rhs * lhs;
+    }
+
+    inline std::ostream& operator<<(std::ostream& os, const Vector4& v) {
+        os << static_cast<std::string>(v);
+        return os;
+    }
+
 }
 #endif
 

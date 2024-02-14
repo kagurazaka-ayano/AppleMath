@@ -83,6 +83,14 @@ namespace Math {
         return std::string("(" + std::to_string(data[0]) + ", " + std::to_string(data[1]) + ")");
     }
 
+    Vector3 Vector2::cross(const Vector2 &rhs) const {
+        return Vector3(simd::cross(data, rhs.data));
+    }
+
+    Vector2 Vector2::unit() const {
+        return *this / length();
+    }
+
     Vector3::Vector3() : Vector3(simd::double3{0.0, 0.0, 0.0}) {
 
     }
@@ -191,6 +199,14 @@ namespace Math {
         return Vector3(simd::cross(data, rhs.data));
     }
 
+    Vector3::Vector3(const Vector2 &other, double z) : Vector3(simd::double3{other[0], other[1], z}) {
+
+    }
+
+    Vector3 Vector3::unit() const {
+        return *this / length();
+    }
+
     Vector4::Vector4() : Vector4(simd::double4{0.0, 0.0, 0.0, 0.0}) {
 
     }
@@ -295,6 +311,10 @@ namespace Math {
 
     Vector4 Vector4::componentProd(const Vector4 &rhs) const {
         return Vector4(data * rhs.data);
+    }
+
+    Vector4 Vector4::unit() const {
+        return *this / length();
     }
 }
 
