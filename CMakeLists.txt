@@ -13,15 +13,21 @@ FetchContent_declare(
     GIT_TAG         main
 )
 FetchContent_makeAvailable(googletest)
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB TESTS "test/*.cpp")
+file(GLOB VECTOR_TEST "test/VectorTest.cpp")
+file(GLOB MATRIX_TEST "test/MatrixTest.cpp")
 set(INCLUDE "include")
 include_directories(${INCLUDE})
-add_library(Math STATIC ${SOURCES})
-add_executable(tests ${TESTS} ${SOURCES})
-target_include_directories(tests PUBLIC ${googletest_SOURCE_DIR}/googletest/include  ${gtest_SOURCE_DIR})
-target_link_libraries(tests gtest_main Math)
-gtest_add_tests(TARGET tests)
-add_test(NAME tests COMMAND tests)
+
+add_executable(vector_test ${VECTOR_TEST})
+target_include_directories(vector_test PUBLIC ${googletest_SOURCE_DIR}/googletest/include ${gtest_SOURCE_DIR})
+target_link_libraries(vector_test gtest_main Math)
+gtest_add_tests(TARGET vector_test)
+add_test(NAME vector_test COMMAND vector_test)
+
+add_executable(matrix_test ${MATRIX_TEST})
+target_include_directories(matrix_test PUBLIC ${googletest_SOURCE_DIR}/googletest/include ${gtest_SOURCE_DIR})
+target_link_libraries(matrix_test gtest_main Math)
+gtest_add_tests(TARGET matrix_test)
+add_test(NAME matrix_test COMMAND matrix_test)
 
 
