@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(Math)
+project(AppleMath)
 include(FetchContent)
 include(GoogleTest)
 enable_testing()
@@ -20,13 +20,13 @@ include_directories(${INCLUDE})
 
 add_executable(vector_test ${VECTOR_TEST})
 target_include_directories(vector_test PUBLIC ${googletest_SOURCE_DIR}/googletest/include ${gtest_SOURCE_DIR})
-target_link_libraries(vector_test gtest_main Math)
+target_link_libraries(vector_test gtest_main)
 gtest_add_tests(TARGET vector_test)
 add_test(NAME vector_test COMMAND vector_test)
 
 add_executable(matrix_test ${MATRIX_TEST})
 target_include_directories(matrix_test PUBLIC ${googletest_SOURCE_DIR}/googletest/include ${gtest_SOURCE_DIR})
-target_link_libraries(matrix_test gtest_main Math)
+target_link_libraries(matrix_test gtest_main)
 gtest_add_tests(TARGET matrix_test)
 add_test(NAME matrix_test COMMAND matrix_test)
 

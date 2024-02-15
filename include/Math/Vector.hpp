@@ -18,6 +18,16 @@ namespace AppleMath {
         N == 3, simd::double3, std::conditional_t<
         N == 4, simd::double4, void>>>;
     public:
+        explicit Vector() {
+            if constexpr (N == 2) {
+                data = simd::double2{0.0, 0.0};
+            } else if constexpr (N == 3) {
+                data = simd::double3{0.0, 0.0, 0.0};
+            } else if constexpr (N == 4) {
+                data = simd::double4{0.0, 0.0, 0.0, 0.0};
+            }
+        }
+
         explicit Vector(p_vector data) : data(data) {
 
         }

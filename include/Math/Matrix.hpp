@@ -57,6 +57,14 @@ namespace AppleMath{
         is4x3, simd::double4x3, std::conditional_t<
         is4x4, simd::double4x4, void>>>>>>>>>;
     public:
+        Matrix() {
+            for(std::size_t i = 0; i < R; i++) {
+                for(std::size_t j = 0; j < C; j++) {
+                    data.columns[i][j] = 0;
+                }
+            }
+        }
+
         explicit Matrix(p_matrix data) : data(data) {
 
         }
