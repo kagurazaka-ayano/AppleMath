@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include "Math/Vector.hpp"
+#include "AppleMath/Vector.hpp"
+#include "AppleMath/Matrix.hpp"
 
 using namespace AppleMath;
 
@@ -117,4 +118,82 @@ TEST(VectorTest, InequalityOperator) {
 TEST(VectorTest, OutOfRangeIndex) {
     Vector<3> v({1.0, 2.0, 3.0});
     EXPECT_THROW(v[3], std::out_of_range);
+}
+
+TEST(VectorTest, ScalarMultiplication) {
+    Vector3 v{1.0, 2.0, 3.0};
+    auto result = 2.0 * v;
+    auto cmp = Vector3{2.0, 4.0, 6.0};
+    EXPECT_EQ(result, cmp);
+}
+
+TEST(VectorTest, ScalarMultiplicationZero) {
+    Vector3 v{1.0, 2.0, 3.0};
+    auto result = 0.0 * v;
+    auto cmp = Vector3{0.0, 0.0, 0.0};
+    EXPECT_EQ(result, cmp);
+}
+
+TEST(VectorTest, MakeHomoCoord2D) {
+    Vector2 v{1.0, 2.0};
+    auto result = makeHomoCoord(v);
+    auto cmp = Vector3{1.0, 2.0, 1.0};
+    EXPECT_EQ(result, cmp);
+}
+
+TEST(VectorTest, MakeHomoCoord3D) {
+    Vector3 v{1.0, 2.0, 3.0};
+    auto result = makeHomoCoord(v);
+    auto cmp = Vector4{1.0, 2.0, 3.0, 1.0};
+    EXPECT_EQ(result, cmp);
+}
+
+TEST(VectorTest, ApplyTrans2D) {
+    Vector2 v{1.0, 2.0};
+    Matrix<2, 2> m{{1.0, 0.0}, {0.0, 1.0}};
+    auto result = applyTrans(v, m);
+    EXPECT_EQ(result, v);
+}
+
+TEST(VectorTest, ApplyTrans3D) {
+    Vector3 v{1.0, 2.0, 3.0};
+    Matrix<3, 3> m{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}};
+    auto result = applyTrans(v, m);
+    EXPECT_EQ(result, v);
+}
+
+TEST(VectorTest, ApplyTrans4D) {
+    Vector4 v{1.0, 2.0, 3.0, 4.0};
+    Matrix<4, 4> m{{1.0, 0.0, 0.0, 0.0}, {0.0, 1.0, 0.0, 0.0}, {0.0, 0.0, 1.0, 0.0}, {0.0, 0.0, 0.0, 1.0}};
+    auto result = applyTrans(v, m);
+    EXPECT_EQ(result, v);
+}
+
+TEST(VectorTest, Rotation2D) {
+    Vector2 v{1.0, 0.0};
+    auto rotation = M_PI / 2;
+    auto mat = makeRotationMatrixR2(rotation);
+    auto result = applyTrans(v, mat);
+    EXPECT_NEAR(result[0], 0, EPS);
+    EXPECT_EQ(result[1], 1);
+}
+
+TEST(VectorTest, Rotation3D) {
+    Vector3 v{1, 0, 0};
+    auto phi = M_PI / 2;
+    auto theta = M_PI / 2;
+    auto psi = M_PI / 2;
+    auto mat = makeRotationMatrixR3(phi, theta, psi);
+    auto result = applyTrans(v, mat["z"]);
+    EXPECT_NEAR(result[0], 0, EPS);
+    EXPECT_NEAR(result[1], 1, EPS);
+    EXPECT_NEAR(result[2], 0, EPS);
+    result = applyTrans(result, mat["x"]);
+    EXPECT_NEAR(result[0], 0, EPS);
+    EXPECT_NEAR(result[1], 0, EPS);
+    EXPECT_NEAR(result[2], 1, EPS);
+    result = applyTrans(result, mat["y"]);
+    EXPECT_NEAR(result[0], 1, EPS);
+    EXPECT_NEAR(result[1], 0, EPS);
+    EXPECT_NEAR(result[2], 0, EPS);
 }

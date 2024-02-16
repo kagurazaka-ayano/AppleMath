@@ -9,6 +9,9 @@
 #define MATH_CONFIGURATION_HPP
 
 namespace AppleMath {
+    /**
+     * a very small value
+     */
     constexpr double EPS = 1e-4;
 }
 
