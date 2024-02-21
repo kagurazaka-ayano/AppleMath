@@ -401,7 +401,7 @@ namespace AppleMath{
      * @return translation matrix for R2
      * @remark this should be used for vector in P2(or R3 with last element be 1)
      */
-    Matrix<3, 3> makeTranslationMatrixR2(double x, double y) {
+    inline Matrix<3, 3> makeTranslationMatrixR2(double x, double y) {
         return Matrix<3, 3>(simd::double3x3{simd_double3{1.0, 0.0, 0.0}, simd_double3{0.0, 1.0, 0.0}, simd_double3{x, y, 1.0}});
     }
 
@@ -413,7 +413,7 @@ namespace AppleMath{
      * @return translation
      * @remark this should be used for vector in P3(or R4 with last element be 1)
      */
-    Matrix<4, 4> makeTranslationMatrixR3(double x, double y, double z) {
+    inline Matrix<4, 4> makeTranslationMatrixR3(double x, double y, double z) {
         return Matrix<4, 4>(simd::double4x4{simd_double4{1.0, 0.0, 0.0, 0.0}, simd_double4{0.0, 1.0, 0.0, 0.0}, simd_double4{0.0, 0.0, 1.0, 0.0}, simd_double4{x, y, z, 1.0}});
     }
 
