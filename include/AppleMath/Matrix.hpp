@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <simd/simd.h>
+#include <unordered_map>
 #include "AppleMath/configuration.hpp"
 #include "AppleMath/Vector.hpp"
 
