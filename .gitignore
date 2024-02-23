@@ -52,3 +52,7 @@ doc/out
 
 # End of https://www.toptal.com/developers/gitignore/api/c++
 
+# vscode
+.timetracker
+.cache
+.clang-format

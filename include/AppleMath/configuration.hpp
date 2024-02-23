@@ -8,7 +8,10 @@
 #ifndef MATH_CONFIGURATION_HPP
 #define MATH_CONFIGURATION_HPP
 
+
+
 namespace AppleMath {
+
     /**
      * a very small value
      */
