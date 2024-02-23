@@ -446,9 +446,15 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
         };
     } else if (simd::fabs(from_n.dot(to_n) + 1) < EPS) {
         angle = M_PI;
-        // kernal of the linear system used to find the vecthr such that the dot product is 0
-        axis = { -from_n[1] * 1 / from_n[0] - from_n[2] * 1 / from_n[0], 1, 1 };
-        axis = axis.normalized();
+        // if it lies on yz plane, avoiding division by zero
+        if (from_n[0] == 0) {
+            axis = {1, 0, 0};
+        }
+        else {
+            // kernal of the linear system used to find the vecthr such that the dot product is 0
+            axis = { -from_n[1] * 1 / from_n[0] - from_n[2] * 1 / from_n[0], 1, 1 };
+            axis = axis.normalized();
+        }
     } else {
         // orthogonal axis
         axis = from.cross(to).normalized();
