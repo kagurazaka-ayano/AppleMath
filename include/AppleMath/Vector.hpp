@@ -439,13 +439,13 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
     Vector<3> axis;
     double angle;
     // same direction
-    if (from_n == to_n) {
+    if (simd::fabs(from_n.dot(to_n) - 1) < EPS) {
         return {
-            { "x", 0 },
-            { "y", 0 },
-            { "z", 0 }
+            { "psi", 0 },
+            { "theta", 0 },
+            { "phi", 0 }
         };
-    } else if (from_n == -to_n) {
+    } else if (simd::fabs(from_n.dot(to_n) + 1) < EPS) {
         angle = M_PI;
         // kernal of the linear system used to find the vecthr such that the dot product is 0
         axis = { -from_n[1] * 1 / from_n[0] - from_n[2] * 1 / from_n[0], 1, 1 };
