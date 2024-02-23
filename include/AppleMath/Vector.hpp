@@ -9,7 +9,6 @@
 #define MATH_VECTOR_HPP
 #include "AppleMath/Matrix.hpp"
 #include "AppleMath/configuration.hpp"
-#include <cmath>
 #include <iostream>
 #include <simd/conversion.h>
 #include <simd/simd.h>
