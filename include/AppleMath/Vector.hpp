@@ -448,7 +448,7 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
         angle = M_PI;
         // if it lies on yz plane, avoiding division by zero
         if (from_n[0] == 0) {
-            axis = {1, 0, 0};
+            axis = {-1, 0, 0};
         }
         else {
             // kernal of the linear system used to find the vecthr such that the dot product is 0
