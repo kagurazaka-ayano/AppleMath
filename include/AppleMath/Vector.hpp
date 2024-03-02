@@ -407,7 +407,7 @@ Vector<N + 1> makeHomoCoord(const Vector<N>& vec) {
 }
 
 /**
- * @brief extract the R3/R2 value from the homogeneous coordinate
+ * @brief make the homogeneous coordinate collapse to R^(N - 1)
  * @tparam N
  */
 template <std::size_t N>
@@ -416,7 +416,7 @@ Vector<N - 1> deHomonize(const Vector<N>& vec) {
 
     Vector<N - 1> ret;
     for (int i = 0; i < N - 1; i++) {
-        ret.setElement(i, vec[i]);
+        ret.setElement(i, vec[i] / vec[N - 1]);
     }
     return ret;
 }

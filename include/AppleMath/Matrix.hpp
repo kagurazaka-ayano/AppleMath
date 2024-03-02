@@ -329,16 +329,16 @@ public:
 
     /**
      * @brief for implicit conversion between matrix
-     * 
+     *
      * @return p_matrix data held by this matrix
      */
     operator p_matrix() {
         return data;
     }
-    
+
     /**
      * @brief for implicit conversion between matrix
-     * 
+     *
      * @return p_matrix data held by this matrix
      */
     operator p_matrix() const {
@@ -392,13 +392,31 @@ Matrix<R, R> makeIdentity() {
  * @exception invalid_argument thrown when angle is greater than 2 * PI
  */
 inline Matrix<2, 2> makeRotationMatrixR2(float angle_rad) {
-    float c = std::cos(angle_rad);
-    float s = std::sin(angle_rad);
+    float c, s;
+    if (angle_rad < EPS) {
+        c = 1;
+        s = 0;
+    } else {
+        c = std::cos(angle_rad);
+        s = std::sin(angle_rad);
+    }
     return Matrix<2, 2>(simd::float2x2 { simd_float2 { c, s }, simd_float2 { -s, c } });
 }
 
 /**
- * @brief construct matrix in R3
+ * @brief make a rotation matrix for homogeneous coordinate in P2
+ * @param angle_rad rotation angle(clockwise), in radian
+ * @return rotation matrix
+ * @remark the angle cannot be bigger than 2 * PI
+ * @exception invalid_argument thrown when angle is greater than 2 * PI
+ */
+inline Matrix<3, 3> makeRotationMatrixP2(float angle_rad) {
+    auto r2 = makeRotationMatrixR2(angle_rad);
+    return Matrix<3, 3>(simd::float3x3 { simd_float3 { r2[0, 0], r2[1, 0], 0 }, simd_float3 { r2[0, 1], r2[1, 1], 0 }, simd_float3 { 0, 0, 1 } });
+}
+
+/**
+ * @brief construct rotation matrix in R3
  * @param psi rotation angle about x axis
  * @param theta rotation angle about y axis
  * @param phi rotation angle about z axis
@@ -409,31 +427,45 @@ inline Matrix<3, 3> makeEulerRotationMatrixR3(double psi, double theta, double p
     if (simd::fabs(psi) < EPS) {
         c_psi = 1;
         s_psi = psi;
-    }
-    else {
+    } else {
         c_psi = std::cos(psi);
         s_psi = std::sin(psi);
     }
     if (simd::fabs(theta) < EPS) {
         c_theta = 1;
-        s_theta = 0;
-    }
-    else {
+        s_theta = theta;
+    } else {
         c_theta = std::cos(theta);
         s_theta = std::sin(theta);
     }
     if (simd::fabs(phi) < EPS) {
         c_phi = 1;
-        s_phi = 0;
-    }
-    else {
+        s_phi = phi;
+    } else {
         c_phi = std::cos(phi);
         s_phi = std::sin(phi);
     }
     return {
-        { c_theta * c_phi,                          c_theta * s_phi,                            -s_theta        },
-        { s_psi * s_theta * c_phi - c_psi * s_phi,  s_psi * s_theta * s_phi + c_psi * c_phi,    s_psi * c_theta },
-        { c_psi * s_theta * c_phi + s_psi * s_phi,  c_psi * s_theta * s_phi - s_psi * c_phi,    c_psi * c_theta }
+        { c_theta * c_phi, c_theta * s_phi, -s_theta },
+        { s_psi * s_theta * c_phi - c_psi * s_phi, s_psi * s_theta * s_phi + c_psi * c_phi, s_psi * c_theta },
+        { c_psi * s_theta * c_phi + s_psi * s_phi, c_psi * s_theta * s_phi - s_psi * c_phi, c_psi * c_theta }
+    };
+}
+
+/**
+ * @brief construct rotation matrix for homogeneous coordinate in P3
+ * @param psi rotation angle about x axis
+ * @param theta rotation angle about y axis
+ * @param phi rotation angle about z axis
+ * @return rotation matrix of given abgle
+ */
+inline Matrix<4, 4> makeEulerRotationMatrixP3(double psi, double theta, double phi) {
+    auto r3 = makeEulerRotationMatrixR3(psi, theta, phi);
+    return {
+        { r3[0, 0], r3[1, 0], r3[2, 0], 0 },
+        { r3[0, 1], r3[1, 1], r3[2, 1], 0 },
+        { r3[0, 2], r3[1, 2], r3[2, 2], 0 },
+        { 0, 0, 0, 1 }
     };
 }
 
@@ -457,11 +489,30 @@ Matrix<N, N> makeScaleMatrix(float x, float y, float z = 1.0) {
 }
 
 /**
+ * @brief make a scale matrix
+ * @tparam N dimension of the scale matrix
+ * @param x scale in x direction
+ * @param y scale in y direction
+ * @param z scale in z direction, will be omitted when N = 2
+ * @return the scale matrix with given parameter and dimension
+ */
+template <std::size_t N>
+    requires(N == 2 || N == 3)
+Matrix<N, N> makeScaleMatrixHomo(float x, float y, float z = 1.0) {
+    if (x == 0.0 || y == 0.0)
+        throw std::invalid_argument("Scale factor cannot be zero");
+    if constexpr (N == 2)
+        return Matrix<3, 3>(simd::float3x3 { simd_float3 { x, 0.0, 0.0 }, simd_float3 { 0.0, y, 0.0 }, simd_float3 { 0.0, 0.0, 1.0 } });
+    if constexpr (N == 3)
+        return Matrix<4, 4>(simd::float4x4 { simd_float4 { x, 0.0, 0.0, 0.0 }, simd_float4 { 0.0, y, 0.0, 0.0 }, simd_float4 { 0.0, 0.0, z, 0.0 }, simd_float4 { 0.0, 0.0, 0.0, 1.0 } });
+}
+
+/**
  * @brief make a translation matrix in R2
  * @param x translation in x direction
  * @param y translation in y direction
  * @return translation matrix for R2
- * @remark this should be used for vector in P2(or R3 with last element be 1)
+ * @remark this should be used for vector in P2
  */
 inline Matrix<3, 3> makeTranslationMatrixR2(float x, float y) {
     return Matrix<3, 3>(simd::float3x3 { simd_float3 { 1.0, 0.0, 0.0 }, simd_float3 { 0.0, 1.0, 0.0 }, simd_float3 { x, y, 1.0 } });
@@ -473,10 +524,35 @@ inline Matrix<3, 3> makeTranslationMatrixR2(float x, float y) {
  * @param y translation in y direction
  * @param z translation in z direction
  * @return translation
- * @remark this should be used for vector in P3(or R4 with last element be 1)
+ * @remark this should be used for vector in P3
  */
 inline Matrix<4, 4> makeTranslationMatrixR3(float x, float y, float z) {
     return Matrix<4, 4>(simd::float4x4 { simd_float4 { 1.0, 0.0, 0.0, 0.0 }, simd_float4 { 0.0, 1.0, 0.0, 0.0 }, simd_float4 { 0.0, 0.0, 1.0, 0.0 }, simd_float4 { x, y, z, 1.0 } });
+}
+
+/**
+ * @brief construct rotation matrix for homogeneous coordinate in P3 about a point
+ * @param pt point the rotation is about
+ * @param psi rotation angle about x axis, or the only rotation when C == 2
+ * @param theta rotation angle about y axis, will be ignored when C == 2
+ * @param phi rotation angle about z axis, will be ignored when C == 2
+ * @return rotation matrix of given abgle about a given point
+ */
+template <std::size_t C>
+    requires(C == 2) || (C == 3)
+inline Matrix<C + 1, C + 1> makeEulerRotationMatrixAboutPt(Vector<C> pt, double psi, double theta = 0, double phi = 0) {
+    if constexpr (C == 3) {
+        auto rotation = makeEulerRotationMatrixP3(psi, theta, phi);
+        auto translation = makeTranslationMatrixR3(pt[0], pt[1], pt[2]);
+        auto inv_translation = makeTranslationMatrixR3(-pt[0], -pt[1], -pt[2]);
+        return translation * rotation * inv_translation;
+    }
+    if constexpr (C == 2) {
+        auto rotation = makeRotationMatrixP2(psi);
+        auto translation = makeTranslationMatrixR2(pt[0], pt[1]);
+        auto inv_translation = makeTranslationMatrixR2(-pt[0], -pt[1]);
+        return translation * rotation * inv_translation;
+    }
 }
 
 }
