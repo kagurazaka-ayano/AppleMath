@@ -54,7 +54,7 @@ class Matrix {
     static constexpr bool is4x3 = CheckSize::row4 && CheckSize::col3;
     static constexpr bool is4x4 = CheckSize::row4 && CheckSize::col4;
     using p_matrix = std::conditional_t<
-        is2x2, simd::double2x2, std::conditional_t<is2x3, simd::double2x3, std::conditional_t<is2x4, simd::double2x4, std::conditional_t<is3x2, simd::double3x2, std::conditional_t<is3x3, simd::double3x3, std::conditional_t<is3x4, simd::double3x4, std::conditional_t<is4x2, simd::double4x2, std::conditional_t<is4x3, simd::double4x3, std::conditional_t<is4x4, simd::double4x4, void>>>>>>>>>;
+        is2x2, simd::float2x2, std::conditional_t<is2x3, simd::float2x3, std::conditional_t<is2x4, simd::float2x4, std::conditional_t<is3x2, simd::float3x2, std::conditional_t<is3x3, simd::float3x3, std::conditional_t<is3x4, simd::float3x4, std::conditional_t<is4x2, simd::float4x2, std::conditional_t<is4x3, simd::float4x3, std::conditional_t<is4x4, simd::float4x4, void>>>>>>>>>;
 
 public:
     Matrix() {
@@ -76,7 +76,7 @@ public:
      * @brief constructor
      * @param data an array with each entry as column of the the matrix, from left to right
      */
-    explicit Matrix(std::array<std::array<double, C>, R> data) {
+    explicit Matrix(std::array<std::array<float, C>, R> data) {
         for (std::size_t i = 0; i < R; i++) {
             for (std::size_t j = 0; j < C; j++) {
                 this->data.columns[i][j] = data[i][j];
@@ -87,7 +87,7 @@ public:
      * @brief constructor
      * @param li an initializer list with each entry as column of the the matrix, from left to right
      */
-    Matrix(std::initializer_list<std::initializer_list<double>> li) {
+    Matrix(std::initializer_list<std::initializer_list<float>> li) {
         int col_idx = 0;
         if (li.size() != R)
             throw std::invalid_argument("Invalid size");
@@ -148,7 +148,7 @@ public:
      * @param rhs scalar
      * @return a matrix, product of the scalar and the matrix
      */
-    Matrix operator*(double rhs) const {
+    Matrix operator*(float rhs) const {
         return Matrix(simd_mul(rhs, data));
     }
     /**
@@ -174,7 +174,7 @@ public:
      * @param rhs scalar
      * @return product matrix
      */
-    Matrix operator/(double rhs) const {
+    Matrix operator/(float rhs) const {
         return Matrix(simd_mul(1.0 / rhs, data));
     }
     /**
@@ -200,7 +200,7 @@ public:
      * @param rhs scalar
      * @return this matrix, product of the scalar and the matrix
      */
-    Matrix operator*=(double rhs) {
+    Matrix operator*=(float rhs) {
         data = simd_mul(rhs, data);
         return *this;
     }
@@ -220,7 +220,7 @@ public:
      * @param rhs scalar
      * @return this matrix, quotient the matrix and the scalar
      */
-    Matrix operator/=(double rhs) {
+    Matrix operator/=(float rhs) {
         data = simd_mul(1.0 / rhs, data);
         return *this;
     }
@@ -276,7 +276,7 @@ public:
      * @return element of ith row and jth column
      * @exception out_of_range thrown when element accessed is out of range
      */
-    double operator()(std::size_t i, std::size_t j) const {
+    float operator()(std::size_t i, std::size_t j) const {
         if (i >= R || j >= C)
             throw std::out_of_range("index out of range");
         return data.columns[j][i];
@@ -289,7 +289,7 @@ public:
      * @return reference to element of ith row and jth column
      * @exception out_of_range thrown when element accessed is out of range
      */
-    double operator[](std::size_t i, std::size_t j) {
+    float operator[](std::size_t i, std::size_t j) {
         if (i >= R || j >= C)
             throw std::out_of_range("index out of range");
         return data.columns[j][i];
@@ -301,7 +301,7 @@ public:
      * @param j jth column
      * @exception out_of_range thrown when element accessed is out of range
      */
-    void setElement(std::size_t i, std::size_t j, double val) {
+    void setElement(std::size_t i, std::size_t j, float val) {
         if (i >= R || j >= C)
             throw std::out_of_range("index out of range");
         data.columns[j][i] = val;
@@ -327,6 +327,24 @@ public:
         return ss.str();
     }
 
+    /**
+     * @brief for implicit conversion between matrix
+     * 
+     * @return p_matrix data held by this matrix
+     */
+    operator p_matrix() {
+        return data;
+    }
+    
+    /**
+     * @brief for implicit conversion between matrix
+     * 
+     * @return p_matrix data held by this matrix
+     */
+    operator p_matrix() const {
+        return data;
+    }
+
 private:
     p_matrix data;
 };
@@ -338,12 +356,12 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix<R, C>& m) {
 }
 
 template <std::size_t R, std::size_t C>
-inline Matrix<R, C> operator*(double lhs, Matrix<R, C> rhs) {
+inline Matrix<R, C> operator*(float lhs, Matrix<R, C> rhs) {
     return rhs * lhs;
 }
 
 template <std::size_t R, std::size_t C>
-inline Matrix<R, C> operator/(double lhs, Matrix<R, C> rhs) {
+inline Matrix<R, C> operator/(float lhs, Matrix<R, C> rhs) {
     return rhs * 1 / lhs;
 }
 
@@ -356,11 +374,11 @@ template <std::size_t R>
     requires(R == 2 || R == 3 || R == 4)
 Matrix<R, R> makeIdentity() {
     if constexpr (R == 2) {
-        return Matrix<2, 2>(matrix_identity_double2x2);
+        return Matrix<2, 2>(matrix_identity_float2x2);
     } else if constexpr (R == 3) {
-        return Matrix<3, 3>(matrix_identity_double3x3);
+        return Matrix<3, 3>(matrix_identity_float3x3);
     } else if constexpr (R == 4) {
-        return Matrix<4, 4>(matrix_identity_double4x4);
+        return Matrix<4, 4>(matrix_identity_float4x4);
     } else {
         throw std::invalid_argument("Matrix must be 2x2, 3x3, or 4x4");
     }
@@ -373,10 +391,10 @@ Matrix<R, R> makeIdentity() {
  * @remark the angle cannot be bigger than 2 * PI
  * @exception invalid_argument thrown when angle is greater than 2 * PI
  */
-inline Matrix<2, 2> makeRotationMatrixR2(double angle_rad) {
-    double c = std::cos(angle_rad);
-    double s = std::sin(angle_rad);
-    return Matrix<2, 2>(simd::double2x2 { simd_double2 { c, s }, simd_double2 { -s, c } });
+inline Matrix<2, 2> makeRotationMatrixR2(float angle_rad) {
+    float c = std::cos(angle_rad);
+    float s = std::sin(angle_rad);
+    return Matrix<2, 2>(simd::float2x2 { simd_float2 { c, s }, simd_float2 { -s, c } });
 }
 
 /**
@@ -387,22 +405,35 @@ inline Matrix<2, 2> makeRotationMatrixR2(double angle_rad) {
  * @return rotation matrix of given abgle
  */
 inline Matrix<3, 3> makeEulerRotationMatrixR3(double psi, double theta, double phi) {
-    if (simd::fabs(psi) < EPS)
-        psi = 0;
-    if (simd::fabs(theta) < EPS)
-        theta = 0;
-    if (simd::fabs(phi) < EPS)
-        phi = 0;
-    double c_psi = std::cos(psi);
-    double s_psi = std::sin(psi);
-    double c_theta = std::cos(theta);
-    double s_theta = std::sin(theta);
-    double c_phi = std::cos(phi);
-    double s_phi = std::sin(phi);
+    float c_psi, s_psi, c_theta, s_theta, c_phi, s_phi;
+    if (simd::fabs(psi) < EPS) {
+        c_psi = 1;
+        s_psi = psi;
+    }
+    else {
+        c_psi = std::cos(psi);
+        s_psi = std::sin(psi);
+    }
+    if (simd::fabs(theta) < EPS) {
+        c_theta = 1;
+        s_theta = 0;
+    }
+    else {
+        c_theta = std::cos(theta);
+        s_theta = std::sin(theta);
+    }
+    if (simd::fabs(phi) < EPS) {
+        c_phi = 1;
+        s_phi = 0;
+    }
+    else {
+        c_phi = std::cos(phi);
+        s_phi = std::sin(phi);
+    }
     return {
-        { c_theta * c_phi, c_theta * s_phi, -s_theta },
-        { s_psi * s_theta * c_phi - c_psi * s_phi, s_psi * s_theta * s_phi + c_psi * c_phi, s_psi * c_theta },
-        { c_psi * s_theta * c_phi + s_psi * s_phi, c_psi * s_theta * s_phi - s_psi * c_phi, c_psi * c_theta }
+        { c_theta * c_phi,                          c_theta * s_phi,                            -s_theta        },
+        { s_psi * s_theta * c_phi - c_psi * s_phi,  s_psi * s_theta * s_phi + c_psi * c_phi,    s_psi * c_theta },
+        { c_psi * s_theta * c_phi + s_psi * s_phi,  c_psi * s_theta * s_phi - s_psi * c_phi,    c_psi * c_theta }
     };
 }
 
@@ -416,13 +447,13 @@ inline Matrix<3, 3> makeEulerRotationMatrixR3(double psi, double theta, double p
  */
 template <std::size_t N>
     requires(N == 2 || N == 3)
-Matrix<N, N> makeScaleMatrix(double x, double y, double z = 1.0) {
+Matrix<N, N> makeScaleMatrix(float x, float y, float z = 1.0) {
     if (x == 0.0 || y == 0.0)
         throw std::invalid_argument("Scale factor cannot be zero");
     if constexpr (N == 2)
-        return Matrix<2, 2>(simd::double2x2 { simd_double2 { x, 0.0 }, simd_double2 { 0.0, y } });
+        return Matrix<2, 2>(simd::float2x2 { simd_float2 { x, 0.0 }, simd_float2 { 0.0, y } });
     if constexpr (N == 3)
-        return Matrix<3, 3>(simd::double3x3 { simd_double3 { x, 0.0, 0.0 }, simd_double3 { 0.0, y, 0.0 }, simd_double3 { 0.0, 0.0, z } });
+        return Matrix<3, 3>(simd::float3x3 { simd_float3 { x, 0.0, 0.0 }, simd_float3 { 0.0, y, 0.0 }, simd_float3 { 0.0, 0.0, z } });
 }
 
 /**
@@ -432,8 +463,8 @@ Matrix<N, N> makeScaleMatrix(double x, double y, double z = 1.0) {
  * @return translation matrix for R2
  * @remark this should be used for vector in P2(or R3 with last element be 1)
  */
-inline Matrix<3, 3> makeTranslationMatrixR2(double x, double y) {
-    return Matrix<3, 3>(simd::double3x3 { simd_double3 { 1.0, 0.0, 0.0 }, simd_double3 { 0.0, 1.0, 0.0 }, simd_double3 { x, y, 1.0 } });
+inline Matrix<3, 3> makeTranslationMatrixR2(float x, float y) {
+    return Matrix<3, 3>(simd::float3x3 { simd_float3 { 1.0, 0.0, 0.0 }, simd_float3 { 0.0, 1.0, 0.0 }, simd_float3 { x, y, 1.0 } });
 }
 
 /**
@@ -444,8 +475,8 @@ inline Matrix<3, 3> makeTranslationMatrixR2(double x, double y) {
  * @return translation
  * @remark this should be used for vector in P3(or R4 with last element be 1)
  */
-inline Matrix<4, 4> makeTranslationMatrixR3(double x, double y, double z) {
-    return Matrix<4, 4>(simd::double4x4 { simd_double4 { 1.0, 0.0, 0.0, 0.0 }, simd_double4 { 0.0, 1.0, 0.0, 0.0 }, simd_double4 { 0.0, 0.0, 1.0, 0.0 }, simd_double4 { x, y, z, 1.0 } });
+inline Matrix<4, 4> makeTranslationMatrixR3(float x, float y, float z) {
+    return Matrix<4, 4>(simd::float4x4 { simd_float4 { 1.0, 0.0, 0.0, 0.0 }, simd_float4 { 0.0, 1.0, 0.0, 0.0 }, simd_float4 { 0.0, 0.0, 1.0, 0.0 }, simd_float4 { x, y, z, 1.0 } });
 }
 
 }

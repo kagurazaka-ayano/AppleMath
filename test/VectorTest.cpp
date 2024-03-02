@@ -6,7 +6,7 @@ using namespace AppleMath;
 
 TEST(VectorTest, ConstructorFromPVector)
 {
-    simd::double3 data = { 1.0, 2.0, 3.0 };
+    simd::float3 data = { 1.0, 2.0, 3.0 };
     Vector<3> v(data);
     EXPECT_EQ(v[0], 1.0);
     EXPECT_EQ(v[1], 2.0);
@@ -15,7 +15,7 @@ TEST(VectorTest, ConstructorFromPVector)
 
 TEST(VectorTest, ConstructorFromArray)
 {
-    std::array<double, 3> data = { 1.0, 2.0, 3.0 };
+    std::array<float, 3> data = { 1.0, 2.0, 3.0 };
     Vector<3> v(data);
     EXPECT_EQ(v[0], 1.0);
     EXPECT_EQ(v[1], 2.0);
@@ -96,7 +96,7 @@ TEST(VectorTest, Normalized)
 {
     Vector<3> v({ 1.0, 2.0, 2.0 });
     Vector<3> v2 = v.normalized();
-    EXPECT_NEAR(v2.length(), 1.0, 1e-9);
+    EXPECT_NEAR(v2.length(), 1.0, 1e-4);
 }
 
 TEST(VectorTest, DotProduct)
@@ -197,23 +197,23 @@ TEST(VectorTest, ApplyTrans4D)
 
 TEST(VectorTest, ApplyTrans_Rotation2D) {
     Vector<2> v{1.0, 0.0};
-    double rotation = M_PI / 2;
+    float rotation = M_PI / 2;
     auto mat = makeRotationMatrixR2(rotation);
     Vector<2> result = applyTrans(v, mat);
-    EXPECT_NEAR(result[0], 0.0, 1e-9);
-    EXPECT_NEAR(result[1], 1.0, 1e-9);
+    EXPECT_NEAR(result[0], 0.0, 1e-4);
+    EXPECT_NEAR(result[1], 1.0, 1e-4);
 }
 
 TEST(VectorTest, ApplyTrans_Rotation3D) {
     Vector<3> v{1.0, 0.0, 0.0};
-    double phi = M_PI / 2;
-    double theta = M_PI / 2;
-    double psi = M_PI / 2;
+    float phi = M_PI / 2;
+    float theta = M_PI / 2;
+    float psi = M_PI / 2;
     auto mat = makeEulerRotationMatrixR3(phi, theta, psi);
     Vector<3> result = applyTrans(v, mat);
-    EXPECT_NEAR(result[0], 0.0, 1e-9);
-    EXPECT_NEAR(result[1], 0.0, 1e-9);
-    EXPECT_NEAR(result[2], -1.0, 1e-9);
+    EXPECT_NEAR(result[0], 0.0, 1e-4);
+    EXPECT_NEAR(result[1], 0.0, 1e-4);
+    EXPECT_NEAR(result[2], -1.0, 1e-4);
 }
 
 
@@ -250,17 +250,17 @@ TEST(VectorTest, AngleBetweenR2)
 {
     Vector<2> v1 { 1.0, 0.0 };
     Vector<2> v2 { 0.0, 1.0 };
-    double angle = getAngleBetweenR2(v1, v2);
+    float angle = getAngleBetweenR2(v1, v2);
     // Check if the function correctly calculates the angle between the vectors
-    EXPECT_NEAR(angle, M_PI_2, 1e-9);
+    EXPECT_NEAR(angle, M_PI_2, 1e-4);
 }
 
 TEST(VectorTest, AngleBetweenR2_SpecialAngles)
 {
     Vector<2> v1 { 1.0, 0.0 };
     Vector<2> v2 { 1.0, 0.0 };
-    double angle = getAngleBetweenR2(v1, v2);
+    float angle = getAngleBetweenR2(v1, v2);
     // Check if the function correctly calculates the angle between the vectors
     // when they are the same
-    EXPECT_NEAR(angle, 0.0, 1e-9);
+    EXPECT_NEAR(angle, 0.0, 1e-4);
 }

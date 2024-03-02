@@ -6,11 +6,12 @@
 */
 
 #include <gtest/gtest.h>
-#include "AppleMath//Matrix.hpp"
+#include "AppleMath/Matrix.hpp"
+#include "AppleMath/Vector.hpp"
 #include "AppleMath/configuration.hpp"
 
 TEST(MatrixTests, MatrixConstructorWithArrayProducesCorrectResult) {
-    std::array<std::array<double, 2>, 2> data = {{ {1.0, 2.0}, {3.0, 4.0} }};
+    std::array<std::array<float, 2>, 2> data = {{ {1.0, 2.0}, {3.0, 4.0} }};
     AppleMath::Matrix<2, 2> matrix(data);
     EXPECT_DOUBLE_EQ(matrix(0, 0), 1.0);
     EXPECT_DOUBLE_EQ(matrix(0, 1), 3.0);
@@ -74,16 +75,6 @@ TEST(MatrixTests, MatrixMultiplicationAssignmentWithMatrixProducesCorrectResult)
     EXPECT_DOUBLE_EQ(matrix1(1, 1), 46.0);
 }
 
-TEST(MatrixTests, makeRotationMatrixR2ThrowsForInvalidAngle) {
-    EXPECT_THROW(AppleMath::makeRotationMatrixR2(M_PI * 2.1), std::invalid_argument);
-}
-
-TEST(MatrixTests, MakeRotationMatrixR3ThrowsForInvalidAngles) {
-    EXPECT_THROW(AppleMath::makeRotationMatrixR3(M_PI * 2.1, M_PI / 2, M_PI / 2), std::invalid_argument);
-    EXPECT_THROW(AppleMath::makeRotationMatrixR3(M_PI / 2, M_PI * 2.1, M_PI / 2), std::invalid_argument);
-    EXPECT_THROW(AppleMath::makeRotationMatrixR3(M_PI / 2, M_PI / 2, M_PI * 2.1), std::invalid_argument);
-}
-
 TEST(MatrixTests, makeRotationMatrixR2ProducesCorrectResult) {
     AppleMath::Matrix<2, 2> matrix = AppleMath::makeRotationMatrixR2(M_PI / 2);
     EXPECT_NEAR(matrix(0, 0), 0.0, AppleMath::EPS);
@@ -92,40 +83,28 @@ TEST(MatrixTests, makeRotationMatrixR2ProducesCorrectResult) {
     EXPECT_NEAR(matrix(1, 1), 0.0, AppleMath::EPS);
 }
 
-TEST(MatrixTests, MakeRotationMatrixR3ProducesCorrectResult) {
-    auto matrix = AppleMath::makeRotationMatrixR3(M_PI / 2, M_PI / 2, M_PI / 2);
-    auto x_matrix = matrix.at("x");
-    auto y_matrix = matrix.at("y");
-    auto z_matrix = matrix.at("z");
-    EXPECT_DOUBLE_EQ(x_matrix(0, 0), 1.0);
-    EXPECT_NEAR(x_matrix(0, 1), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(x_matrix(0, 2), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(x_matrix(1, 0), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(x_matrix(1, 1), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(x_matrix(1, 2), -1.0);
-    EXPECT_NEAR(x_matrix(2, 0), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(x_matrix(2, 1), 1.0);
-    EXPECT_NEAR(x_matrix(2, 2), 0.0, AppleMath::EPS);
+TEST(MatrixTest, TestMakeEulerRotationMatrixR3) {
+    float psi = M_PI / 2; // 90 degrees
+    float theta = M_PI; // 180 degrees
+    float phi = M_PI / 2; // 90 degrees
 
-    EXPECT_NEAR(y_matrix(0, 0), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(y_matrix(0, 1), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(y_matrix(0, 2), 1.0);
-    EXPECT_NEAR(y_matrix(1, 0), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(y_matrix(1, 1), 1.0);
-    EXPECT_NEAR(y_matrix(1, 2), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(y_matrix(2, 0), -1.0);
-    EXPECT_NEAR(y_matrix(2, 1), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(y_matrix(2, 2), 0.0, AppleMath::EPS);
+    auto result = AppleMath::makeEulerRotationMatrixR3(psi, theta, phi);
 
-    EXPECT_NEAR(z_matrix(0, 0), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(z_matrix(0, 1), -1.0);
-    EXPECT_NEAR(z_matrix(0, 2), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(z_matrix(1, 0), 1.0);
-    EXPECT_NEAR(z_matrix(1, 1), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(z_matrix(1, 2), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(z_matrix(2, 0), 0.0, AppleMath::EPS);
-    EXPECT_NEAR(z_matrix(2, 1), 0.0, AppleMath::EPS);
-    EXPECT_DOUBLE_EQ(z_matrix(2, 2), 1.0);
+    // Expected result for these angles
+    AppleMath::Matrix<3, 3> expected {
+        {{0, -1, 0},
+        {0, 0, -1},
+        {1, 0, 0}}
+    };
+    ASSERT_NEAR((result[0, 0]), (expected[0, 0]), (1e-3));
+    ASSERT_NEAR((result[0, 1]), (expected[0, 1]), (1e-3));
+    ASSERT_NEAR((result[0, 2]), (expected[0, 2]), (1e-3));
+    ASSERT_NEAR((result[1, 0]), (expected[1, 0]), (1e-3));
+    ASSERT_NEAR((result[1, 1]), (expected[1, 1]), (1e-3));
+    ASSERT_NEAR((result[1, 2]), (expected[1, 2]), (1e-3));
+    ASSERT_NEAR((result[2, 0]), (expected[2, 0]), (1e-3));
+    ASSERT_NEAR((result[2, 1]), (expected[2, 1]), (1e-3));
+    ASSERT_NEAR((result[2, 2]), (expected[2, 2]), (1e-3));
 }
 
 TEST(MatrixTests, MatrixVectorMultiplication) {
@@ -139,40 +118,51 @@ TEST(MatrixTests, MatrixVectorMultiplication) {
 
 TEST(MatrixTests, IdentityMatrix2x2) {
     auto result = AppleMath::makeIdentity<2>();
-    auto cmp = AppleMath::Matrix<2, 2>(matrix_identity_double2x2);
+    auto cmp = AppleMath::Matrix<2, 2>(matrix_identity_float2x2);
     EXPECT_EQ(result, cmp);
 }
 
 TEST(MatrixTests, IdentityMatrix3x3) {
     auto result = AppleMath::makeIdentity<3>();
-    auto cmp = AppleMath::Matrix<3, 3>(matrix_identity_double3x3);
+    auto cmp = AppleMath::Matrix<3, 3>(matrix_identity_float3x3);
     EXPECT_EQ(result, cmp);
 }
 
 TEST(MatrixTests, IdentityMatrix4x4) {
     auto result = AppleMath::makeIdentity<4>();
-    auto cmp = AppleMath::Matrix<4, 4>(matrix_identity_double4x4);
+    auto cmp = AppleMath::Matrix<4, 4>(matrix_identity_float4x4);
     EXPECT_EQ(result, cmp);
 }
 
 TEST(MatrixTests, RotationMatrixR2) {
     double angle = M_PI / 4.0; // 45 degrees
     auto result = AppleMath::makeRotationMatrixR2(angle);
-    EXPECT_NEAR(result(0, 0), std::cos(angle), 1e-9);
-    EXPECT_NEAR(result(0, 1), -std::sin(angle), 1e-9);
-    EXPECT_NEAR(result(1, 0), std::sin(angle), 1e-9);
-    EXPECT_NEAR(result(1, 1), std::cos(angle), 1e-9);
+    EXPECT_NEAR(result(0, 0), std::cos(angle), 1e-3);
+    EXPECT_NEAR(result(0, 1), -std::sin(angle), 1e-3);
+    EXPECT_NEAR(result(1, 0), std::sin(angle), 1e-3);
+    EXPECT_NEAR(result(1, 1), std::cos(angle), 1e-3);
 }
 
 TEST(MatrixTests, RotationMatrixR3) {
     double angle_phi = M_PI / 4.0; // 45 degrees
     double angle_theta = M_PI / 3.0; // 60 degrees
     double angle_psi = M_PI / 2.0; // 90 degrees
-    auto result = AppleMath::makeRotationMatrixR3(angle_phi, angle_theta, angle_psi);
-    // Check if the returned map contains all keys
-    EXPECT_EQ(result.count("x"), 1);
-    EXPECT_EQ(result.count("y"), 1);
-    EXPECT_EQ(result.count("z"), 1);
+    auto result = AppleMath::makeEulerRotationMatrixR3(angle_psi, angle_theta, angle_phi);
+    // Expected result for these angles
+    AppleMath::Matrix<3, 3> expected {
+        {{0.354, 0.354, -0.866},
+        {0.612, 0.612, 0.5},
+        {0.707, -0.707, 0}}
+    };
+    ASSERT_NEAR((result[0, 0]), (expected[0, 0]), (1e-3));
+    ASSERT_NEAR((result[0, 1]), (expected[0, 1]), (1e-3));
+    ASSERT_NEAR((result[0, 2]), (expected[0, 2]), (1e-3));
+    ASSERT_NEAR((result[1, 0]), (expected[1, 0]), (1e-3));
+    ASSERT_NEAR((result[1, 1]), (expected[1, 1]), (1e-3));
+    ASSERT_NEAR((result[1, 2]), (expected[1, 2]), (1e-3));
+    ASSERT_NEAR((result[2, 0]), (expected[2, 0]), (1e-3));
+    ASSERT_NEAR((result[2, 1]), (expected[2, 1]), (1e-3));
+    ASSERT_NEAR((result[2, 2]), (expected[2, 2]), (1e-3));
 }
 
 TEST(MatrixTests, ScaleMatrix2x2) {

@@ -26,9 +26,9 @@ template <std::size_t N>
     requires(N == 2 || N == 3 || N == 4)
 class Vector {
     using p_vector = std::conditional_t<
-        N == 2, simd::double2,
-        std::conditional_t<N == 3, simd::double3,
-            std::conditional_t<N == 4, simd::double4, void>>>;
+        N == 2, simd::float2,
+        std::conditional_t<N == 3, simd::float3,
+            std::conditional_t<N == 4, simd::float4, void>>>;
 
 public:
     /**
@@ -36,11 +36,11 @@ public:
      */
     explicit Vector() {
         if constexpr (N == 2) {
-            data = simd::double2 { 0.0, 0.0 };
+            data = simd::float2 { 0.0, 0.0 };
         } else if constexpr (N == 3) {
-            data = simd::double3 { 0.0, 0.0, 0.0 };
+            data = simd::float3 { 0.0, 0.0, 0.0 };
         } else if constexpr (N == 4) {
-            data = simd::double4 { 0.0, 0.0, 0.0, 0.0 };
+            data = simd::float4 { 0.0, 0.0, 0.0, 0.0 };
         }
     }
 
@@ -56,7 +56,7 @@ public:
      * constructor
      * @param data array with elements
      */
-    explicit Vector(const std::array<double, N>& data) {
+    explicit Vector(const std::array<float, N>& data) {
         for (std::size_t i = 0; i < N; i++) {
             this->data[i] = data[i];
         }
@@ -66,13 +66,13 @@ public:
      * @brief constructor
      * @param li initializer list with elements
      */
-    Vector(const std::initializer_list<double>& li) {
+    Vector(const std::initializer_list<float>& li) {
         if (li.size() != N) {
             throw std::invalid_argument(
                 "Initializer list size does not match vector size");
         }
         std::size_t i = 0;
-        for (double it : li) {
+        for (float it : li) {
             data[i] = it;
             i++;
         }
@@ -126,14 +126,14 @@ public:
      * @param rhs scalar
      * @return result
      */
-    Vector operator*(double rhs) const { return Vector(data * rhs); }
+    Vector operator*(float rhs) const { return Vector(data * rhs); }
 
     /**
      * @brief scalar division
      * @param rhs scalar
      * @return result
      */
-    Vector operator/(double rhs) const { return Vector(data / rhs); }
+    Vector operator/(float rhs) const { return Vector(data / rhs); }
 
     /**
      * @brief self increment
@@ -160,7 +160,7 @@ public:
      * @param rhs scalar
      * @return reference to this vector
      */
-    Vector& operator*=(double rhs) {
+    Vector& operator*=(float rhs) {
         data *= rhs;
         return *this;
     }
@@ -170,7 +170,7 @@ public:
      * @param rhs scalar
      * @return reference to this vector
      */
-    Vector& operator/=(double rhs) {
+    Vector& operator/=(float rhs) {
         data /= rhs;
         return *this;
     }
@@ -180,7 +180,7 @@ public:
      * @param index index
      * @return element at index position
      */
-    double operator[](std::size_t index) const {
+    float operator[](std::size_t index) const {
         if (index >= N) {
             throw std::out_of_range("Index out of range");
         }
@@ -192,7 +192,7 @@ public:
      * @param idx index
      * @return element at index position
      */
-    double operator()(std::size_t idx) const {
+    float operator()(std::size_t idx) const {
         if (idx >= N) {
             throw std::out_of_range("Index out of range");
         }
@@ -216,7 +216,7 @@ public:
      *
      * @return x component
      */
-    double x() const {
+    float x() const {
         return *this[0];
     }
 
@@ -225,7 +225,7 @@ public:
      *
      * @return y component
      */
-    double y() const {
+    float y() const {
         return *this[1];
     }
 
@@ -234,7 +234,7 @@ public:
      *
      * @return z component
      */
-    double z() const {
+    float z() const {
         if constexpr (N < 3) {
             throw std::out_of_range("vector of size " + std::to_string(N) + " doesn't have z component");
         }
@@ -246,7 +246,7 @@ public:
      *
      * @return w component
      */
-    double w() const {
+    float w() const {
         if constexpr (N < 4) {
             throw std::out_of_range("vector of size " + std::to_string(N) + " doesn't have z component");
         }
@@ -259,7 +259,7 @@ public:
      * @param idx index
      * @param val value you want to set
      */
-    void setElement(std::size_t idx, double val) {
+    void setElement(std::size_t idx, float val) {
         if (N <= idx)
             throw std::out_of_range("index out of range");
         data[idx] = val;
@@ -269,13 +269,13 @@ public:
      * @brief vector length squared
      * @return vector length squared
      */
-    double lengthSq() const { return simd::length_squared(data); }
+    float lengthSq() const { return simd::length_squared(data); }
 
     /**
      * @brief vector length
      * @return vector length
      */
-    double length() const { return simd::length(data); }
+    float length() const { return simd::length(data); }
 
     /**
      * @brief return normalized (length = 1) version of this vector
@@ -288,7 +288,7 @@ public:
      * @param rhs another vector with same size
      * @return result
      */
-    double dot(const Vector<N>& rhs) const { return simd::dot(data, rhs.data); }
+    float dot(const Vector<N>& rhs) const { return simd::dot(data, rhs.data); }
 
     /**
      * @brief cross product
@@ -356,6 +356,24 @@ public:
      */
     p_vector getData() const { return data; }
 
+    /**
+     * @brief for implicit conversion between raw vectors
+     * 
+     * @return p_vector data held by this vector
+     */
+    operator p_vector() {
+        return data;
+    }
+
+    /**
+     * @brief for implicit conversion between raw vectors
+     * 
+     * @return p_vector data held by this vector
+     */
+    operator p_vector() const {
+        return data;
+    }
+
 private:
     p_vector data;
 };
@@ -369,7 +387,7 @@ private:
  */
 template <std::size_t N>
     requires(N == 2 || N == 3 || N == 4)
-inline Vector<N> operator*(double lhs, const Vector<N>& rhs) {
+inline Vector<N> operator*(float lhs, const Vector<N>& rhs) {
     return rhs * lhs;
 }
 
@@ -432,11 +450,11 @@ inline std::ostream& operator<<(std::ostream& os, const Vector<N>& v) {
  * @param to another vector
  * @return a key-value mapping, key is the rotation angle name, value is the rotation in radians
  */
-inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>& from, const Vector<3>& to) {
+inline std::unordered_map<std::string, float> getAngleBetweenR3(const Vector<3>& from, const Vector<3>& to) {
     auto from_n = from.normalized();
     auto to_n = to.normalized();
     Vector<3> axis;
-    double angle;
+    float angle;
     // same direction
     if (simd::fabs(from_n.dot(to_n) - 1) < EPS) {
         return {
@@ -467,7 +485,7 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
         { axis[1], -axis[0], 0 }
     };
     auto R = makeIdentity<3>() + simd::sin(angle) * K + (1 - simd::cos(angle)) * K * K;
-    double psi, theta, phi;
+    float psi, theta, phi;
     // rotation matrix decomposition
     // if there is a lock
     if (R[2, 0] == 1 || R[2, 0] == -1) {
@@ -481,7 +499,7 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
         }
     } else {
         theta = -simd::asin(R[2, 0]);
-        double c_theta = simd::cos(theta);
+        float c_theta = simd::cos(theta);
         psi = simd::atan2(R[2, 1] / c_theta, R[2, 2] / c_theta);
         phi = simd::atan2(R[1, 0] / c_theta, R[0, 0] / c_theta);
     }
@@ -506,8 +524,8 @@ inline std::unordered_map<std::string, double> getAngleBetweenR3(const Vector<3>
  * @param to another vector
  * @return the rotation in radians
  */
-inline double getAngleBetweenR2(Vector<2> from, Vector<2> to) {
-    double dot = from.dot(to);
+inline float getAngleBetweenR2(Vector<2> from, Vector<2> to) {
+    float dot = from.dot(to);
     return simd::acos(dot / from.length() / to.length());
 }
 
