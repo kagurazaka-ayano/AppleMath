@@ -217,7 +217,7 @@ public:
      * @return x component
      */
     float x() const {
-        return *this[0];
+        return (*this)[0];
     }
 
     /**
@@ -226,7 +226,7 @@ public:
      * @return y component
      */
     float y() const {
-        return *this[1];
+        return (*this)[1];
     }
 
     /**
@@ -238,7 +238,7 @@ public:
         if constexpr (N < 3) {
             throw std::out_of_range("vector of size " + std::to_string(N) + " doesn't have z component");
         }
-        return *this[2];
+        return (*this)[2];
     }
 
     /**
@@ -250,7 +250,7 @@ public:
         if constexpr (N < 4) {
             throw std::out_of_range("vector of size " + std::to_string(N) + " doesn't have z component");
         }
-        return *this[3];
+        return (*this)[3];
     }
 
     /**
