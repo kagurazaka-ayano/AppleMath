@@ -221,9 +221,9 @@ TEST(VectorTest, AngleBetweenR3_SameDirection) {
     Vector<3> v1{1.0, 0.0, 0.0};
     Vector<3> v2{1.0, 0.0, 0.0};
     auto angles = getAngleBetweenR3(v1, v2);
-    EXPECT_DOUBLE_EQ(angles["roll"], 0);
-    EXPECT_DOUBLE_EQ(angles["pitch"], 0);
-    EXPECT_DOUBLE_EQ(angles["yaw"], 0);
+    EXPECT_DOUBLE_EQ(angles["psi"], 0);
+    EXPECT_DOUBLE_EQ(angles["theta"], 0);
+    EXPECT_DOUBLE_EQ(angles["phi"], 0);
 }
 
 TEST(VectorTest, AngleBetweenR3_OppositeDirection) {
